@@ -77,13 +77,27 @@ double calc_time(struct timeval start, struct timeval end) {
 /****************************************************
  *                  Loop Fusion
  * **************************************************/
+// void do_loops(int *a, int *b, int *c, int N) {
+//     int i;
+//     for (i = N - 1; i >= 1; i--) {
+//         a[i] = a[i] + 1;
+//     }
+//     for (i = 1; i < N; i++) {
+//         b[i] = a[i + 1] + 3;
+//         c[i] = b[i - 1] + 2;
+//     }
+// }
+
+/****************************************************
+ *                  Loop Reversal
+ * **************************************************/
 void do_loops(int *a, int *b, int *c, int N) {
     int i;
     for (i = N - 1; i >= 1; i--) {
         a[i] = a[i] + 1;
+        b[i] = a[i + 1] + 3;
     }
     for (i = 1; i < N; i++) {
-        b[i] = a[i + 1] + 3;
         c[i] = b[i - 1] + 2;
     }
 }
