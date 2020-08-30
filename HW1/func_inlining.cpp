@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+// int add(int a, int b) __attribute__((__always_inline__));
+
 double calc_time(struct timeval start, struct timeval end) {
     double start_sec = (double)start.tv_sec*1000000.0 + (double)start.tv_usec;
     double end_sec = (double)end.tv_sec*1000000.0 + (double)end.tv_usec;
