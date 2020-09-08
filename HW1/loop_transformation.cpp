@@ -94,20 +94,10 @@ if (threshold < 4) {
 	}
 } else {
 	for (j = 0; j < N; j++){
-		for (i = 0; i < 4; i++) {
 			sum = sum + a[j][0] + 1;
 			sum = sum + a[j][1] + 1;
 			sum = sum + a[j][2] + 1;
 			sum = sum + a[j][3] + 1;
-		}
 	}
 }
 ...
-
-
-
-
-
-
-
-
