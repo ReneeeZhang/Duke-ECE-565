@@ -68,31 +68,45 @@ void print_msg(const char* title, double elapsed_ns) {
     printf("\n");
 }
 
-void test_write_only() {
+void test_write_only(void) {
     double elapsed_ns = calculate_write_only_time();
     print_msg("Write traffic only", elapsed_ns);
 }
 
-void test_read_write_1_1() {
+void test_read_write_1_1(void) {
     double elapsed_ns = calculate_read_write_1_1_time();
     print_msg("1:1 read-to-write traffic", elapsed_ns);
 }
 
-void test_read_write_2_1() {
+void test_read_write_2_1(void) {
     double elapsed_ns = calculate_read_write_2_1_time();
     print_msg("2:1 read-to-write traffic", elapsed_ns);
 }
 
 int main(int argc, char *argv[]) {
+    if(argc != 3) {
+        printf("Usage: ./bandwith_gauger <NUM_ELEMENTS> <NUM_TRAVERSALS>");
+        return EXIT_FAILURE;
+    }
     num_elements = atoi(argv[1]);
     num_traversals = atoi(argv[2]);
     
     array = malloc(num_elements * sizeof(*array));
-    init_array();
+    if(array == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
 
+    // What if testing by multi-threads. What's the tradeoff? A lot of overhead? Will the overhead consumed by caches so that bandwidth measured could be lower
+    init_array();
     test_write_only();
+
+    init_array();   // Do I need to init array every time I start a different test? I am concerning about writing back takes time
     test_read_write_1_1();
+
+    init_array();
     test_read_write_2_1();
 
     free(array);
+    return EXIT_SUCCESS;
 }
