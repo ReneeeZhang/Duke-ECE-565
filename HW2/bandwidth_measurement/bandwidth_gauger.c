@@ -24,7 +24,7 @@ void init_array(void) {
     }
 }
 
-double calculate_write_only_time() {
+double calculate_write_only_time(void) {
     struct timespec start_time, end_time;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
     for(int i = 0; i < num_traversals; i++) {
@@ -36,7 +36,7 @@ double calculate_write_only_time() {
     return calc_time(start_time, end_time);
 }
 
-double calculate_read_write_1_1_time() {
+double calculate_read_write_1_1_time(void) {
     struct timespec start_time, end_time;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
     for(int i = 0; i < num_traversals; i++) {
@@ -48,7 +48,7 @@ double calculate_read_write_1_1_time() {
     return calc_time(start_time, end_time);
 }
 
-double calculate_read_write_2_1_time() {
+double calculate_read_write_2_1_time(void) {
     struct timespec start_time, end_time;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
     for(int i = 0; i < num_traversals; i++) {
