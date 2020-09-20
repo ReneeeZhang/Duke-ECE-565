@@ -61,26 +61,26 @@ double calculate_read_write_2_1_time() {
     return calc_time(start_time, end_time);
 }
 
-void print_msg(const char* title, double elapsed_ns) {
+void print_msg(const char* title, double elapsed_ns, int times) {
     printf("********************%s*********************\n", title);
     printf("Time = %lf ns\n", elapsed_ns);
-    printf("Bandwidth is = %lf GB/s\n", ((double)num_elements * num_traversals * 8) / (elapsed_ns));
+    printf("Bandwidth is = %lf GB/s\n", ((double)num_elements * num_traversals * times * 8) / (elapsed_ns));
     printf("\n");
 }
 
 void test_write_only(void) {
     double elapsed_ns = calculate_write_only_time();
-    print_msg("Write traffic only", elapsed_ns);
+    print_msg("Write traffic only", elapsed_ns, 1);
 }
 
 void test_read_write_1_1(void) {
     double elapsed_ns = calculate_read_write_1_1_time();
-    print_msg("1:1 read-to-write traffic", elapsed_ns);
+    print_msg("1:1 read-to-write traffic", elapsed_ns, 2);
 }
 
 void test_read_write_2_1(void) {
     double elapsed_ns = calculate_read_write_2_1_time();
-    print_msg("2:1 read-to-write traffic", elapsed_ns);
+    print_msg("2:1 read-to-write traffic", elapsed_ns, 3);
 }
 
 int main(int argc, char *argv[]) {
@@ -98,13 +98,14 @@ int main(int argc, char *argv[]) {
     }
 
     // What if testing by multi-threads. What's the tradeoff? A lot of overhead? Will the overhead consumed by caches so that bandwidth measured could be lower
+    // Can compiler issue parallel instructions by optimizing the loop?
     init_array();
     test_write_only();
 
-    init_array();   // Do I need to init array every time I start a different test? I am concerning about writing back takes time
+    // init_array();   // Do I need to init array every time I start a different test? I am concerning about writing back takes time
     test_read_write_1_1();
 
-    init_array();
+    // init_array();
     test_read_write_2_1();
 
     free(array);
