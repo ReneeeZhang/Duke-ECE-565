@@ -64,8 +64,7 @@ double calculate_read_write_2_1_time(void) {
 void print_msg(const char* title, double elapsed_ns, int times) {
     printf("********************%s*********************\n", title);
     printf("Time = %lf ns\n", elapsed_ns);
-    printf("Bandwidth is = %lf GB/s\n", ((double)num_elements * num_traversals * times * 8) / (elapsed_ns));
-    printf("\n");
+    printf("Bandwidth is = %lf GB/s\n\n", ((double)num_elements * num_traversals * times * 8) / (elapsed_ns));
 }
 
 void test_write_only(void) {
