@@ -1,0 +1,8 @@
+Rainfall simulation took 170 time steps to complete.
+Runtime = 0.0000125 seconds
+
+The following grid shows the number of raindrops absorbed at each point:
+    17.5     2.5     2.5       3
+     2.5    3.75    5.75    42.5
+     2.5     2.5     2.5      25
+   37.25    5.25     2.5     2.5
