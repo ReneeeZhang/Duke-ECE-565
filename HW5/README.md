@@ -1,0 +1,1 @@
+Check Script - Usage: ./check.py [dimension] [validation file] [output file]
