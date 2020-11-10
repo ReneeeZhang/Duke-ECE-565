@@ -10,7 +10,7 @@ all: $(TARGETS)
 $(TARGETS): %: %.o
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-$(TARGETS:=.o): %.o: %.c
+$(TARGETS:=.o): %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 clean:
