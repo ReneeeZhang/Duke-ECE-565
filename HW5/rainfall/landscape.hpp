@@ -1,9 +1,9 @@
 #include <algorithm>
-#include <unordered_set>
+#include <vector>
+#include <utility>
 
 #include <iostream>
 
-enum class Direction {North, East, South, West};
 class Landscape {
     private:
         int dim;
@@ -14,7 +14,7 @@ class Landscape {
         
         double* raindrops;
         double* absorbed_drops;
-        std::unordered_set<Direction>* trickling_directions;
+        std::vector<std::pair<int, int> >* trickling_directions;
         
         void receive_rain_drop(int row, int col) {
             raindrops[row * dim + col]++;
@@ -22,7 +22,7 @@ class Landscape {
 
         void absorb(int row, int col, double absorption_rate);
 
-        void calculate_trickling_drops(int row, int col);
+        void calculate_trickling_drops(int row, int col, double* elevations);
 
         void trickle(int row, int col);
 
@@ -40,4 +40,5 @@ class Landscape {
 
         // Debug purpose
         void insert(void);
+        void print_trickling_directions(void);
 };
