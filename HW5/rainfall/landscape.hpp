@@ -22,7 +22,7 @@ class Landscape {
 
         void absorb(int row, int col, double absorption_rate);
 
-        void calculate_trickling_drops(int row, int col, double* elevations);
+        void calculate_trickling_directions(int row, int col, double* elevations);
 
         void trickle(int row, int col);
 

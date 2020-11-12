@@ -33,13 +33,13 @@ Landscape::Landscape(int _dim, const char* filepath): dim(_dim),
     print_elevations(elevations);
     for(int i = 0; i < dim; i++) {
         for(int j = 0; j < dim; j++) {
-            calculate_trickling_drops(i, j, elevations);
+            calculate_trickling_directions(i, j, elevations);
         }
     }
     delete[] elevations;
 }
 
-void Landscape::calculate_trickling_drops(int row, int col, double* elevations) {
+void Landscape::calculate_trickling_directions(int row, int col, double* elevations) {
     int startx = std::max(0, col - 1);
     int endx = std::min(dim - 1, col + 1);
     int starty = std::max(0, row - 1);
@@ -50,8 +50,14 @@ void Landscape::calculate_trickling_drops(int row, int col, double* elevations) 
             if((i == row && j == col) || std::abs(i - row) + std::abs(j - col) == 2) {
                 continue;
             }
+            std::vector<std::pair<int, int> >& center_point_trickling_direction = trickling_directions[row * dim + col];
             if(elevations[row * dim + col] > elevations[i * dim + j]) {
-                trickling_directions[row * dim + col].emplace_back(std::pair<int, int>(i, j));
+                if(center_point_trickling_direction.empty() || elevations[i * dim + j] == elevations[center_point_trickling_direction.back().first * dim + center_point_trickling_direction.back().second]) {
+                    center_point_trickling_direction.emplace_back(std::pair<int, int>(i, j));
+                } else if(elevations[i * dim + j] < elevations[center_point_trickling_direction.back().first * dim + center_point_trickling_direction.back().second]) {
+                    center_point_trickling_direction.pop_back();
+                    center_point_trickling_direction.emplace_back(std::pair<int, int>(i, j));    
+                }
             }
         }
     }
@@ -62,7 +68,18 @@ void Landscape::absorb(int row, int col, double absorption_rate) {
     raindrops[row * dim + col] = std::max(0.0, raindrops[row * dim + col] - absorption_rate);
 }
 
-// Debug purpose
+void Landscape::trickle(int row, int col) {
+    if(trickling_directions[row * dim + col].empty()) {
+        return;
+    }
+    for(auto& it : trickling_directions[row * dim + col]) {
+        raindrops[it.first * dim + it.second] += 1 / trickling_directions[row * dim + col].size();
+    }
+}
+
+/***************************************************
+ * Debug purpose
+ * *************************************************/
 void Landscape::print_elevations(double* elevations) {
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
