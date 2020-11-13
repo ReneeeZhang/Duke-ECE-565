@@ -1,7 +1,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <iostream> // Debug purpose
+
+// Debug purpose
+#include <iostream> 
+#include <iomanip>
 
 #include "landscape.hpp"
 
@@ -81,7 +84,7 @@ void Landscape::calculate_trickled_drops(int row, int col) {
 void Landscape::print_elevations(double* elevations) {
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
-            std::cout << elevations[i * dim + j] << ' ';
+            std::cout << std::setw(6) << elevations[i * dim + j] << ' ';
         }
         std::cout << std::endl;
     }
@@ -117,7 +120,7 @@ void Landscape::print_raindrops(void) {
     std::cout << "********* raindrops ***********\n";
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
-            std::cout << raindrops[i * dim + j] << ' ';
+            std::cout << std::setw(6) << raindrops[i * dim + j] << ' ';
         }
         std::cout << std::endl;
     }
@@ -127,7 +130,7 @@ void Landscape::print_trickled_drops(void) {
     std::cout << "********* trickle_drops ***********\n";
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
-            std::cout << trickled_drops[i * dim + j] << ' ';
+            std::cout << std::setw(6) << trickled_drops[i * dim + j] << ' ';
         }
         std::cout << std::endl;
     }
