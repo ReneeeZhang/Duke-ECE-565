@@ -7,24 +7,12 @@
 class Landscape {
     private:
         int dim;
-        // std::vector<std::vector<double> > elevations;
-        // std::vector<std::vector<double> > raindrops;
-        // std::vector<std::vector<double> > absorbed_drops;
-        // std::vector<std::vector<std::unordered_set<Direction> > > trickling_direction;
-        
         double* raindrops;
         double* absorbed_drops;
+        double* trickled_drops;
         std::vector<std::pair<int, int> >* trickling_directions;
-        
-        void receive_rain_drop(int row, int col) {
-            raindrops[row * dim + col]++;
-        }
-
-        void absorb(int row, int col, double absorption_rate);
 
         void calculate_trickling_directions(int row, int col, double* elevations);
-
-        void trickle(int row, int col);
 
         // Debug purpose
         void print_elevations(double* elevations);
@@ -38,7 +26,23 @@ class Landscape {
             delete[] trickling_directions;
         }
 
+        int get_dim(void) {
+            return dim;
+        }
+
+        void receive_rain_drop(int row, int col) {
+            raindrops[row * dim + col]++;
+        }
+
+        void absorb(int row, int col, double absorption_rate);
+
+        void trickle(int row, int col);
+
+        void calculate_trickled_drops(int row, int col);
+
         // Debug purpose
         void insert(void);
         void print_trickling_directions(void);
+        void print_raindrops(void);
+        void print_trickled_drops(void);
 };
