@@ -7,6 +7,7 @@
 class Landscape {
     private:
         int dim;
+        bool is_dry;
         double* raindrops;
         double* absorbed_drops;
         double* trickled_drops;
@@ -26,9 +27,11 @@ class Landscape {
             return dim;
         }
 
-        void receive_rain_drop(int row, int col) {
-            raindrops[row * dim + col]++;
+        bool has_been_dry(void) {
+            return is_dry;
         }
+
+        void receive_rain_drop(int row, int col);
 
         void absorb(int row, int col, double absorption_rate);
 

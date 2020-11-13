@@ -9,6 +9,7 @@
 #include "landscape.hpp"
 
 Landscape::Landscape(int _dim, const char* filepath): dim(_dim),
+                                                      is_dry(true),
                                                       raindrops(new double[dim * dim]()),
                                                       absorbed_drops(new double[dim * dim]()),
                                                       trickled_drops(new double[dim* dim]()),
@@ -66,9 +67,15 @@ void Landscape::calculate_trickling_directions(int row, int col, double* elevati
     }
 }
 
+void Landscape::receive_rain_drop(int row, int col) {
+    is_dry = false;
+    raindrops[row * dim + col]++;
+}
+
 void Landscape::absorb(int row, int col, double absorption_rate) {
     absorbed_drops[row * dim + col] += std::max(0.0, absorption_rate);
     raindrops[row * dim + col] = std::max(0.0, raindrops[row * dim + col] - absorption_rate);
+    is_dry = is_dry && raindrops[row * dim + col] == 0;
 }
 
 void Landscape::trickle(int row, int col) {
