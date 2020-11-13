@@ -35,6 +35,13 @@ Landscape::Landscape(int _dim, const char* filepath): dim(_dim),
     delete[] elevations;
 }
 
+Landscape::~Landscape() {
+    delete[] raindrops;
+    delete[] absorbed_drops;
+    delete[] trickled_drops;
+    delete[] trickling_directions;
+}
+
 void Landscape::calculate_trickling_directions(int row, int col, double* elevations) {
     int startx = std::max(0, col - 1);
     int endx = std::min(dim - 1, col + 1);
@@ -76,6 +83,7 @@ void Landscape::calculate_trickled_drops(int row, int col) {
     for(auto& it : trickling_directions[row * dim + col]) {
         trickled_drops[it.first * dim + it.second] += std::min(1.0, raindrops[row * dim + col]) / trickling_directions[row * dim + col].size();
     }
+    raindrops[row * dim + col] -= std::min(1.0, raindrops[row * dim + col]);
 }
 
 /***************************************************

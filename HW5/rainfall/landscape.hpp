@@ -20,11 +20,7 @@ class Landscape {
     public:
         Landscape(int _dim, const char* filepath);
 
-        ~Landscape() {
-            delete[] raindrops;
-            delete[] absorbed_drops;
-            delete[] trickling_directions;
-        }
+        ~Landscape();
 
         int get_dim(void) {
             return dim;
