@@ -30,7 +30,7 @@ void test_raindrops(void) {
 
     for(int i = 0; i < ls.get_dim(); i++) {
         for(int j = 0; j < ls.get_dim(); j++) {
-            ls.trickle(i, j);
+            ls.trickle_to(i, j);
         }
     }
     ls.print_raindrops();

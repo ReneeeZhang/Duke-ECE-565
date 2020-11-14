@@ -27,7 +27,7 @@ Landscape::Landscape(int _dim, const char* filepath): dim(_dim),
         }
         ++row;
     }
-    print_elevations(elevations);
+    // print_elevations(elevations);
     for(int i = 0; i < dim; i++) {
         for(int j = 0; j < dim; j++) {
             calculate_trickling_directions(i, j, elevations);
@@ -68,17 +68,17 @@ void Landscape::calculate_trickling_directions(int row, int col, double* elevati
 }
 
 void Landscape::receive_rain_drop(int row, int col) {
-    is_dry = false;
     raindrops[row * dim + col]++;
 }
 
 void Landscape::absorb(int row, int col, double absorption_rate) {
-    absorbed_drops[row * dim + col] += std::max(0.0, absorption_rate);
-    raindrops[row * dim + col] = std::max(0.0, raindrops[row * dim + col] - absorption_rate);
-    is_dry = is_dry && raindrops[row * dim + col] == 0;
+    double num_absorbed = std::min(raindrops[row * dim + col], absorption_rate);
+    absorbed_drops[row * dim + col] += num_absorbed;
+    raindrops[row * dim + col] -= num_absorbed;
+    is_dry = is_dry && (raindrops[row * dim + col] == 0);
 }
 
-void Landscape::trickle(int row, int col) {
+void Landscape::trickle_to(int row, int col) {
     raindrops[row * dim + col] += trickled_drops[row * dim + col];
     trickled_drops[row * dim + col] = 0;
 }
@@ -96,10 +96,10 @@ void Landscape::calculate_trickled_drops(int row, int col) {
 /***************************************************
  * Debug purpose
  * *************************************************/
-void Landscape::print_elevations(double* elevations) {
+void Landscape::print_elevations(double* elevations) const {
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
-            std::cout << std::setw(6) << elevations[i * dim + j] << ' ';
+            std::cout << std::setw(8) << std::setprecision(6) << elevations[i * dim + j] << ' ';
         }
         std::cout << std::endl;
     }
@@ -113,7 +113,7 @@ void Landscape::insert(void) {
     }
 }
 
-void Landscape::print_trickling_directions(void) {
+void Landscape::print_trickling_directions(void) const {
     std::cout << "********* trickling directions ***********\n";
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
@@ -131,21 +131,29 @@ void Landscape::print_trickling_directions(void) {
     }
 }
 
-void Landscape::print_raindrops(void) {
-    std::cout << "********* raindrops ***********\n";
+void Landscape::print_raindrops (void) const {
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
-            std::cout << std::setw(6) << raindrops[i * dim + j] << ' ';
+            std::cout << std::setw(8) << std::setprecision(6) << raindrops[i * dim + j] << ' ';
         }
         std::cout << std::endl;
     }
 }
 
-void Landscape::print_trickled_drops(void) {
+void Landscape::print_absorbed_drops (void) const {
+    for(int i = 0; i < dim; ++i) {
+        for(int j = 0; j < dim; ++j) {
+            std::cout << std::setw(8) << std::setprecision(6) << absorbed_drops[i * dim + j] << ' ';
+        }
+        std::cout << std::endl;
+    }
+}
+
+void Landscape::print_trickled_drops(void) const {
     std::cout << "********* trickle_drops ***********\n";
     for(int i = 0; i < dim; ++i) {
         for(int j = 0; j < dim; ++j) {
-            std::cout << std::setw(6) << trickled_drops[i * dim + j] << ' ';
+            std::cout << std::setw(8) << std::setprecision(6) << trickled_drops[i * dim + j] << ' ';
         }
         std::cout << std::endl;
     }

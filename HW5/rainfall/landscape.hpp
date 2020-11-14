@@ -16,18 +16,22 @@ class Landscape {
         void calculate_trickling_directions(int row, int col, double* elevations);
 
         // Debug purpose
-        void print_elevations(double* elevations);
+        void print_elevations(double* elevations) const;
 
     public:
         Landscape(int _dim, const char* filepath);
 
         ~Landscape();
 
-        int get_dim(void) {
+        int get_dim(void) const {
             return dim;
         }
 
-        bool has_been_dry(void) {
+        void reset_is_dry(void) {
+            is_dry = true;
+        }
+
+        bool has_been_dry(void) const {
             return is_dry;
         }
 
@@ -35,13 +39,14 @@ class Landscape {
 
         void absorb(int row, int col, double absorption_rate);
 
-        void trickle(int row, int col);
+        void trickle_to(int row, int col);
 
         void calculate_trickled_drops(int row, int col);
 
         // Debug purpose
         void insert(void);
-        void print_trickling_directions(void);
-        void print_raindrops(void);
-        void print_trickled_drops(void);
+        void print_trickling_directions(void) const;
+        void print_raindrops(void) const;
+        void print_absorbed_drops(void) const;
+        void print_trickled_drops(void) const;
 };
