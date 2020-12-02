@@ -31,7 +31,7 @@ The	following	reflects the	breakdown	of	graded	components	of	the	course,	as	well
 tentative	due	dates	(they	are	subject	to	shift	slightly).		Note	that	some	assignments	will	
 be	completed	in	groups.		Unless	explicitly	denoted	as	a	group	assignment,	all	work	is	
 expected	to	be	done	individually.
-### Programming	+	Written	Problems	(Totally 5):	55%
+### Programming	+	Written	Problems	(Totally 5)
 1. Single-threaded	performance	and	loop	transformations
 2. Cache	and	memory	system	performance
 3. Performance	profiling,	analysis	and	tuning
