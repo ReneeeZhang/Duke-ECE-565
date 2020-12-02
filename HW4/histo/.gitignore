@@ -1,0 +1,8 @@
+uiuc.pgm
+uiuc-large.pgm
+*~
+*.o
+histo
+histo_locks
+histo_atomic
+histo_creative

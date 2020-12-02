@@ -1,0 +1,9 @@
+*~
+
+*.o
+
+AMGMk
+
+gmon.out
+
+perf.data*
