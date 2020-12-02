@@ -59,7 +59,7 @@ void Landscape::calculate_trickling_directions(int row, int col, double* elevati
                 if(center_point_trickling_direction.empty() || elevations[i * dim + j] == elevations[center_point_trickling_direction.back().first * dim + center_point_trickling_direction.back().second]) {
                     center_point_trickling_direction.emplace_back(std::pair<int, int>(i, j));
                 } else if(elevations[i * dim + j] < elevations[center_point_trickling_direction.back().first * dim + center_point_trickling_direction.back().second]) {
-                    center_point_trickling_direction.pop_back();
+                    center_point_trickling_direction.clear();
                     center_point_trickling_direction.emplace_back(std::pair<int, int>(i, j));    
                 }
             }
@@ -76,6 +76,12 @@ void Landscape::absorb(int row, int col, double absorption_rate) {
     absorbed_drops[row * dim + col] += num_absorbed;
     raindrops[row * dim + col] -= num_absorbed;
     is_dry = is_dry && (raindrops[row * dim + col] == 0);
+}
+
+void Landscape::absorb_pt(int row, int col, double absorption_rate) {
+    double num_absorbed = std::min(raindrops[row * dim + col], absorption_rate);
+    absorbed_drops[row * dim + col] += num_absorbed;
+    raindrops[row * dim + col] -= num_absorbed;
 }
 
 void Landscape::trickle_to(int row, int col) {

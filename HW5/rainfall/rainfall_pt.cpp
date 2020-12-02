@@ -1,0 +1,185 @@
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <ctime>
+#include <functional>
+
+#include "landscape.hpp"
+#include "threadpool.hpp"
+
+#define NUM_ARGV 6
+
+static int num_threads;
+static int raining_time;
+static double absorption_rate;
+static int dim;
+
+void validate_argc(int argc) {
+    if(argc != NUM_ARGV) {
+        std::cerr << "Usage: ./rainfall_seq <P> <M> <A> <N> <elevation_file>\n"
+            "P = # of parallel threads to use.\n"
+            "M = # of simulation time steps during which a rain drop will fall on each landscape point. In other words, 1 rain drop falls on each point during the first M steps of the simulation.\n"
+            "A = absorption rate (specified as a floating point number). The amount of raindrops that are absorbed into the ground at a point during a timestep.\n"
+            "N = dimension of the landscape (NxN).\n"
+            "elevation_file = name of input file that specifies the elevation of each point.\n";
+        exit(EXIT_FAILURE);
+    }
+}
+
+void validate_int_from_str(const char* str, const char* what_str) {
+    char* endptr;
+    strtol(str, &endptr, 10);
+    if(*endptr != '\0') {
+        std::cerr << "Wrong " << what_str << ". It should be an integer.\n";
+        exit(EXIT_FAILURE);
+    }
+}
+
+void validate_P(const char* P) {
+    validate_int_from_str(P, "simulation time steps");
+}
+
+void validate_M(const char* M) {
+    validate_int_from_str(M, "simulation time steps");
+}
+
+void validate_N(const char* N) {
+    validate_int_from_str(N, "dimension of the landscape");
+    int dim = atoi(N);
+    if(dim < 32) {
+        std::cerr << "To run parallel edition, the dimension of the landscape should be no smaller than 32.\n";
+    }
+}
+
+void validate_A(const char* A) {
+    char* endptr;
+    strtod(A, &endptr);
+    if(*endptr != '\0') {
+        std::cerr << "Wrong absorption rate. It should be a float point number.\n";
+        exit(EXIT_FAILURE);
+    }
+}
+
+void validate_arguments(int argc, char** argv) {
+    validate_argc(argc);
+    validate_P(argv[1]);
+    validate_M(argv[2]);
+    validate_A(argv[3]);
+    validate_N(argv[4]);
+}
+
+void output_results(int num_steps, double runtime, const Landscape& landscape) {
+    std::cout << "Rainfall simulation completed in " << num_steps << " time steps\n"
+    << "Runtime = " << runtime << " seconds\n\n"
+    << "The following grid shows the number of raindrops absorbed at each point:\n";
+    landscape.print_absorbed_drops();
+}
+
+double calc_time(struct timespec start, struct timespec end) { 
+    double start_sec = (double)start.tv_sec * 1000000000.0 + (double)start.tv_nsec; 
+    double end_sec = (double)end.tv_sec * 1000000000.0 + (double)end.tv_nsec; 
+    if (end_sec < start_sec) {  
+        return 0;   
+    } else {   
+        return end_sec - start_sec;
+    } 
+}
+
+void first_iter(Landscape& landscape, int start_row, int end_row, bool& is_dry, int step) {
+    for(int i = start_row; i < end_row; i++) {
+        for(int j = 0; j < dim; j++) {
+            // Receive raindrops
+            if(step <= raining_time) {
+                landscape.receive_rain_drop(i, j);
+            }
+            // Absorb
+            landscape.absorb_pt(i, j, absorption_rate);
+            is_dry = is_dry && (landscape.get_raindrops(i, j) == 0);
+            // Calculate trickled drops
+            landscape.calculate_trickled_drops(i, j);
+        }
+    }
+}
+
+void second_iter(Landscape& landscape, int start_row, int end_row) {
+    for(int i = start_row; i < end_row; i++) {
+        for(int j = 0; j < dim; j++) {
+            landscape.trickle_to(i, j);
+        }
+    }
+}
+
+bool is_all_dry(const bool* dry_status, int num_threads) {
+    bool ans = true;
+    for(int i = 0; i < num_threads; i++) {
+        ans = ans && dry_status[i * 1024];
+    }
+    return ans;
+}
+
+
+
+int main(int argc, char* argv[]) {
+    // Argument validation
+    validate_arguments(argc, argv);
+
+    // Translate arguments
+    num_threads = atoi(argv[1]);
+    raining_time = atoi(argv[2]);
+    absorption_rate = atof(argv[3]);
+    dim = atoi(argv[4]);
+
+    // init_threadpool
+    TP::ThreadPool thread_pool(num_threads);
+
+    // init landscape
+    Landscape landscape(dim, argv[5]);
+    int step = 1;
+    int curr_dim = landscape.get_dim();
+    int k = curr_dim / num_threads / 2; // evenly distributed
+    bool* dry_status = new bool[num_threads * 1024]();
+
+    // set timer
+    struct timespec start_time, end_time;
+
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    while(true) {
+        // Within one time step
+        // First iteration
+        for(int i = 0; i < num_threads; i++) {
+            dry_status[i * 1024] = true;
+            thread_pool.enqueue(std::bind(first_iter, std::ref(landscape), (2 * i) * k, (2 * i + 1) * k, std::ref(dry_status[i * 1024]), step));
+        }
+
+        thread_pool.waitAll();
+
+        for(int i = 0; i < num_threads; i++) {
+            thread_pool.enqueue(std::bind(first_iter, std::ref(landscape), (2 * i + 1) * k, (2 * i + 2) * k, std::ref(dry_status[i * 1024]), step));
+        }
+
+        thread_pool.waitAll();
+
+        if(is_all_dry(dry_status, num_threads)) {
+            break;
+        }
+
+        // Second iteration
+        for(int i = 0; i < num_threads; i++) {
+            thread_pool.enqueue(std::bind(second_iter, std::ref(landscape), (2 * i) * k, (2 * i + 2) * k));
+        }
+
+        thread_pool.waitAll();
+
+        ++step;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    double runtime = calc_time(start_time, end_time) / 1000000000.0;
+    // thread_pool.joinThreads();
+    
+    delete[] dry_status;
+
+    output_results(step, runtime, landscape);
+    
+    return EXIT_SUCCESS;
+}

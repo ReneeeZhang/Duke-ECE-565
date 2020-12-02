@@ -1,6 +1,14 @@
-CXXFLAGS := -std=gnu++11 -Wall -Werror -pedantic -ggdb3
+CXXFLAGS 		:= -std=gnu++11 -Werror -Wall -pedantic -O3 -lrt
+DEBUGFLAG 		:= -ggdb3
+PROFILERFLAG 	:= -pg
+PTHREAD 		:= -lpthread
+LIBTIMER		:= -L. -ltimer
+# CXXFLAGS += $(DEBUGFLAG)
+# CXXFLAGS += $(PROFILERFLAG)
+
 CXX 	 := g++
-TIMER	 := -lrt
+# BOOSTDIR := /usr/include/boost
+# BOOSTFLAGS  := -lboost_system -lboost_thread -lboost_fiber
 
 TARGETS 	:= rainfall_seq rainfall_pt
 DEPENDENCY	:= landscape
@@ -9,11 +17,23 @@ OBJECTS 	:= $(TARGETS:=.o) landscape.o
 .PHONY: all clean depend
 all: $(TARGETS)
 
-$(TARGETS): %: %.o landscape.o
+# $(TARGETS): %: %.o landscape.o
+# 	$(CXX) $(CXXFLAGS) -o $@ $< landscape.o
+
+rainfall_seq: rainfall_seq.o landscape.o
 	$(CXX) $(CXXFLAGS) -o $@ $< landscape.o
 
-$(TARGETS:=.o): %.o: %.cpp 
-	$(CXX) $(CXXFLAGS) $(TIMER) -o $@ -c $< 
+rainfall_pt: rainfall_pt.o landscape.o
+	$(CXX) $(CXXFLAGS) -o $@ $< landscape.o $(PTHREAD)
+
+# rainfall_seq.o: rainfall_seq.cpp
+# 	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+# rainfall_pt.o: rainfall_pt.cpp
+# 	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+$(TARGETS:=.o): %.o: %.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 landscape.o: landscape.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<

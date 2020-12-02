@@ -5,3 +5,7 @@
 rainfall_seq
 rainfall_pt
 test
+
+# Profiler
+gmon.out
+analysis.txt

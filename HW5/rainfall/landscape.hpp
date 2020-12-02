@@ -27,6 +27,10 @@ class Landscape {
             return dim;
         }
 
+        double get_raindrops(int row, int col) {
+            return raindrops[row * dim + col];
+        }
+
         void reset_is_dry(void) {
             is_dry = true;
         }
@@ -38,6 +42,8 @@ class Landscape {
         void receive_rain_drop(int row, int col);
 
         void absorb(int row, int col, double absorption_rate);
+
+        void absorb_pt(int row, int col, double absorption_rate);
 
         void trickle_to(int row, int col);
 
